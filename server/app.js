@@ -672,33 +672,33 @@ registerI18n(server, (t, error) => {
       console.log("first server listening on port", process.env.PORT);
     });
     const io = require("./socket").init(con);
-    // cron.schedule("5 * * * * *", () => {
-    //   //if(!process.env.installScript){
-    //   const axios = require("axios");
-    //   const https = require("https");
-    //   if (process.env.NODE_ENV !== "production")
-    //     console.log("CRON START RUNNING");
-    //   const agent = new https.Agent({
-    //     rejectUnauthorized: false,
-    //   });
-    //   axios
-    //     .get(
-    //       process.env.PUBLIC_URL +
-    //         process.env.subFolder +
-    //         "cron/execute?cronData=1",
-    //       { httpsAgent: agent }
-    //     )
-    //     .then(function (response) {
-    //       // handle success
-    //       if (process.env.NODE_ENV !== "production")
-    //         console.log("CRON COMPLETED RUNNING");
-    //     })
-    //     .catch(function (error) {
-    //       // handle error
-    //       console.log("ERROR IN EXECUTING CRON", error);
-    //     });
-    //   //}
-    // });
+    cron.schedule("5 * * * * *", () => {
+      //if(!process.env.installScript){
+      const axios = require("axios");
+      const https = require("https");
+      if (process.env.NODE_ENV !== "production")
+        console.log("CRON START RUNNING");
+      const agent = new https.Agent({
+        rejectUnauthorized: false,
+      });
+      axios
+        .get(
+          process.env.PUBLIC_URL +
+            process.env.subFolder +
+            "cron/execute?cronData=1",
+          { httpsAgent: agent }
+        )
+        .then(function (response) {
+          // handle success
+          if (process.env.NODE_ENV !== "production")
+            console.log("CRON COMPLETED RUNNING");
+        })
+        .catch(function (error) {
+          // handle error
+          console.log("ERROR IN EXECUTING CRON", error);
+        });
+      //}
+    });
     //connect to socket
     io.on("connect", (con) => {
       if (process.env.NODE_ENV !== "production")
