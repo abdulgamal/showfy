@@ -1,0 +1,379 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/navigation.ejs') %>
+<div class="content-wrapper">
+  <section class="content">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box box-info">
+          <div class="box-header">
+            <h3 class="box-title"><%- title %></h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-4">
+          <div class="btnanchor">
+            <a href="javascript:;" type="button" class="btn btn-success create-item">Create New</a>
+          </div>
+        </div>
+    </div>
+    <%if(results.length > 0){%>
+      <div class="row"> 
+          <div class="col-xs-12">
+              <div class="callout callout-warning">
+                <p><%- totalCount %> delete video(s) Founds.</p>
+              </div>
+            <div class="box">
+              <!-- /.box-header -->
+              <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                  <tr>
+                    <th><input type="checkbox" class="checkbox checkall"></th>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Levels</th>
+                    <th>Category</th>
+                    <th>Sub Category</th>
+                    <th>Sub Sub Category</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th>Video Deleted</th>
+                    <th>Creation Date</th>
+                    <th>Options</th>
+                  </tr>
+                  <%for(var i=0;i<results.length;i++){%>
+                  <tr>
+                    <td><input type="checkbox" class="checkbox" name="delete_<%-results[i].delete_video_id%>" value="<%-results[i].delete_video_id%>"></td>
+                    <td><%-results[i].delete_video_id%></td>
+                    <td>
+                      <%-results[i].title%>
+                    </td>
+                    <td>
+                      <%- results[i].levels ? results[i].levels : "All Levels"; %>
+                    </td>
+                    <td>
+                      <%-results[i].cattitle ? results[i].cattitle : "-"%>
+                    </td>
+                    <td>
+                      <%-results[i].subcattitle ? results[i].subcattitle : "-"%>
+                    </td>
+                    <td>
+                      <%-results[i].subsubcattitle ? results[i].subsubcattitle : "-"%>
+                    </td>
+                    <td>
+                      last <%-results[i].time_interval +" "+ results[i].time_duration%>
+                    </td>
+                    <td>
+                      <%- results[i].active == 0 ? "Pending" : (results[i].active == 1 ? "Completed" : "Processing") %>
+                    </td>
+                    <td>
+                      <%- results[i].delete_video_count > 0 ? results[i].delete_video_count : '0' ; %>
+                    </td>
+                    <td>
+                      <%let dateS = moment(results[i].creation_date).locale("en")%>
+                      <%= 
+                          dateS.tz(defaultTimezone).format(formatDate)
+                      %>
+                    </td>
+                    <td>
+                        <a  class="btn btn-danger btn-xs" onclick="preDeleteFn(this)" data-id="<%-results[i].delete_video_id;%>" data-toggle="modal" data-target="#modal-danger" >Delete</a>
+                    </td>
+                  </tr>
+                 <% } %>
+                </table>
+                <button type="button" class="btn btn-primary delete-selected">Delete Selected</button>
+              </div>
+              <%if (paggingData) { %>
+                <div class="box-footer clearfix">
+                  <%- paggingData %>
+                </div>
+                <% } %>
+              <!-- /.box-body -->
+            </div>
+            <div class="modal model-dialog-hide" id="modal-danger">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span></button>
+                      <h4 class="modal-title">Delete</h4>
+                    </div>
+                    <div class="modal-body">
+                      <p>Are you sure want to delete this? It will not be recoverable after being deleted.</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" onclick="deleteFunction()" class="btn btn-outline">Delete</button>
+                    </div>
+                  </div>
+                  <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+              </div>
+            <!-- /.box -->
+          </div>
+        </div>
+      <% }else{%>
+            <div class="callout callout-info">  
+                <p>No delete videos created yet.</p>
+            </div>
+      <% } %>
+  </section>
+</div>
+<div class="modal model-dialog-hide" id="modal-edit">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h1 class="modal-title" id="form-title">Create Entry</h1>
+        </div>
+        <div class="modal-body">
+          <form role="form" method="POST" action="" id="create-frm" onsubmit="return false;">
+                <div class="form-group">
+                  <label class="control-label">Title(Descriptive purpose only)</label>
+                  <div>
+                      <input type="text" class="form-control input-lg" name="title" value="" id="title">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label">Tags(comma seprated)</label>
+                  <div>
+                      <input type="text" class="form-control input-lg" name="tags" value="" id="tags">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label">Member Role</label>
+                  <div>
+                      <select name="role" class="form-control input-lg" id="level_id" multiple="multiple">
+                        <option value="">All Member Roles</option>
+                        <%for (var i=0;i<memberLevels.length;i++){ %>
+                          <% if(memberLevels[i].type != "public"){ %>
+                            <option value="<%- memberLevels[i].level_id %>"><%- memberLevels[i].title %></option>
+                          <% } %>
+                       <% } %>
+                      </select>
+                  </div>
+                </div>
+
+                <%if(categories.length){%>
+                  <div>
+                      <label for="category_id" tag="" class="optional">Categories</label>
+                      <select name="category_id" class="form-control" id="category_id">
+                          <option value=""> </option>
+                          <%for (var i=0;i<categories.length;i++){ %>
+                          <option <% if(query.category_id == categories[i].category_id){ %>
+                              selected="selected" <% } %>
+                              value="<%- categories[i].category_id %>"><%- categories[i].title %>
+                          </option>
+                          <% } %>
+                      </select>
+                  </div>
+
+                  <div id="cat_subcategory_id" style="display: none;">
+                      <label for="subcategory_id" tag="" class="optional">Sub Categories</label>
+                      <select name="subcategory_id" class="form-control" id="subcategory_id">
+
+                      </select>
+                  </div>
+
+                  <div id="cat_subsubcategory_id" style="display: none;">
+                      <label for="subsubcategory_id" tag="" class="optional">Sub Sub
+                          Categories</label>
+                      <select name="subsubcategory_id" class="form-control"
+                          id="subsubcategory_id">
+
+                      </select>
+                  </div>
+
+                  <%}%>
+
+                <div class="form-group">
+                  <label class="control-label">Duration</label>
+                  <div style="display:flex;">
+                      <input type="number" style="width:200px;margin-right: 10px;" class="form-control input-lg" name="time_interval" required value="30" id="time_interval">
+                      <select name="time_duration" id="time_duration">
+                        <option value="days" selected>Days</option>
+                        <option value="months">Month</option>
+                        <option value="years">Years</option>
+                      </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <button type="button" class="btn btn-success" id="form-submit" onclick="editItem()">
+                            Create
+                        </button>
+                        or <a href='javascript:$("#modal-edit").modal("toggle")'>cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+  <!-- /.modal-dialog -->
+</div>
+<%- include('../includes/scripts.ejs') %>
+<script type="application/javascript">
+
+$(document).on("change", '#category_id', function (e) {
+        if ($(this).val()) {
+            const subCategories = getItemCategory($(this).val())
+            let subCategoriesData = ""
+            if (subCategories && subCategories.subcategories) {
+                subCategories.subcategories.forEach(sub => {
+                    subCategoriesData += "<option value='" + sub.category_id + "'>" + sub.title + "</option>"
+                });
+                subCategoriesData = "<option></option>" + subCategoriesData
+                $('#subcategory_id').html(subCategoriesData)
+                $('#cat_subcategory_id').show()
+            }else{
+                $('#subcategory_id').html()
+                $('#subcategory_id').val('')
+                $('#cat_subcategory_id').hide()
+            }
+            $('#subsubcategory_id').html()
+            $('#subsubcategory_id').val('')
+            $('#cat_subsubcategory_id').hide()
+        } else {
+            $('#subcategory_id').html()
+            $('#cat_subcategory_id').hide()
+            $('#subcategory_id').val('')
+            $('#subsubcategory_id').html()
+            $('#subsubcategory_id').val('')
+            $('#cat_subsubcategory_id').hide()
+        }
+    })
+    $(document).on("change", '#subcategory_id', function (e) {
+        if ($(this).val()) {
+            const subCategories = getSubItemCategory($('#category_id').val(), $('#subcategory_id').val())
+            let subCategoriesData = ""
+            if (subCategories && subCategories.subsubcategories) {
+                subCategories.subsubcategories.forEach(sub => {
+                    subCategoriesData += "<option value='" + sub.category_id + "'>" + sub.title + "</option>"
+                });
+                subCategoriesData = "<option></option>" + subCategoriesData
+                $('#subsubcategory_id').html(subCategoriesData)
+                $('#cat_subsubcategory_id').show()
+            }else{
+                $('#subsubcategory_id').html()
+                $('#subsubcategory_id').val('')
+                $('#cat_subsubcategory_id').hide()
+            }
+            
+        } else {
+            $('#subsubcategory_id').html()
+            $('#subsubcategory_id').val('')
+            $('#cat_subsubcategory_id').hide()
+        }
+    })
+    function getItemCategory(category_id) {
+        return categoriesData.find(elem => elem.category_id == category_id)
+    }
+    function getSubItemCategory(category_id, subcategory_id) {
+        const categoryData = getItemCategory(category_id)
+        let subCat = []
+        if (categoryData) {
+            subCat = categoryData.subcategories.find(elem => elem.category_id == subcategory_id)
+        }
+        return subCat
+    }
+    var categoriesData = <%- JSON.stringify(categories) %>;
+
+    var category_id = <%- query.category_id ? query.category_id : 0 %>;
+    var subcategory_id = <%- query.subcategory_id ? query.subcategory_id : 0 %>;
+    var subsubcategory_id = <%- query.subsubcategory_id ? query.subsubcategory_id : 0 %>;
+
+    $(document).ready(function (e) {
+        if (category_id != 0) {
+            $('#category_id').val(category_id)
+            //if (subcategory_id != 0) {
+                const subCategories = getItemCategory(category_id)
+                let subCategoriesData = ""
+                if (subCategories && subCategories.subcategories) {
+                    subCategories.subcategories.forEach(sub => {
+                        subCategoriesData += "<option value='" + sub.category_id + "'>" + sub.title + "</option>"
+                    });
+                }
+                if (subCategoriesData != "") {
+                    subCategoriesData = "<option></option>" + subCategoriesData
+                    $('#subcategory_id').html(subCategoriesData)
+                    $('#cat_subcategory_id').show()
+                    $('#subcategory_id').val(subcategory_id)
+                    //if (subsubcategory_id != 0) {
+                        const subsubCategories = getSubItemCategory(category_id, subcategory_id)
+                        let subsubCategoriesData = ""
+                        if (subsubCategories && subsubCategories.subsubcategories) {
+                            subsubCategories.subsubcategories.forEach(sub => {
+                                subsubCategoriesData += "<option value='" + sub.category_id + "'>" + sub.title + "</option>"
+                            });
+                        }
+                        if (subsubCategoriesData != "") {
+                            subsubCategoriesData = "<option></option>" + subsubCategoriesData
+                            $('#subsubcategory_id').html(subsubCategoriesData)
+                            $('#cat_subsubcategory_id').show()
+                            $('#subsubcategory_id').val(subsubcategory_id)
+                        }
+                    //} else {
+                   //     $('#cat_subsubcategory_id').hide()
+                   // }
+                } else {
+                    $('#cat_subcategory_id').hide()
+                }
+            //}
+        }
+    })
+    function editItem(){
+      let valid = true;
+      if($("#title").val() == ""){
+        valid = false;
+        $("#title").css("border","1px solid red");
+      }else{
+        $("#title").css("border","");
+      }
+      if($("#time_interval").val() == ""){
+        valid = false;
+        $("#time_interval").css("border","1px solid red");
+      }else{
+        $("#time_interval").css("border","");
+      }
+      if($("#time_duration").val() == ""){
+        valid = false;
+        $("#time_duration").css("border","1px solid red");
+      }else{
+        $("#time_duration").css("border","");
+      }
+      
+      if(!valid){
+        return false;
+      }
+      var title = $("#title").val();
+      var level_id = $("#level_id").val();
+      var time_interval = $("#time_interval").val();
+      var time_duration = $("#time_duration").val();
+      var category_id = $("#category_id").val();
+      var subcategory_id = $("#subcategory_id").val();
+      var subsubcategory_id = $("#subsubcategory_id").val();
+      var tags = $("#tags").val();
+      $.post("<%-process.env.ADMIN_SLUG%>/tools/create-delete-videos/",{tags:tags,title:title,level_id:level_id,time_interval:time_interval,time_duration:time_duration,category_id:category_id,subcategory_id:subcategory_id,subsubcategory_id:subsubcategory_id},function(e){
+        $("#modal-edit").modal("hide");
+        window.location.reload();
+      })
+    }
+    $(document).on("click",'.create-item',function(e){
+      deleteObjectId = null;
+      $("#create-frm").trigger("reset");
+      $("#modal-edit").modal("toggle")
+    })
+
+
+  var deleteObjectId;
+  function preDeleteFn(obj){
+    deleteObjectId = $(obj).attr('data-id');
+  }
+  function deleteFunction(){
+    window.location.href = "<%= process.env.ADMIN_SLUG %>/tools/delete-videos/delete/%>"+deleteObjectId;
+  }
+</script>
+<%- include('../includes/footer.ejs') %>

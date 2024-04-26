@@ -1,0 +1,325 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/navigation.ejs') %>
+<style>
+  .card .card-image img{
+    height:150px;
+  }
+  .delete-image{
+    z-index: 999999999;
+    position: absolute;
+    display: block;
+    bottom: 0;
+    right: 5px;
+    font-size: 20px;
+    padding: 10px;
+  }
+  <%if(isCover){%>
+    .card .card-image img{
+      max-height: 150px;
+      width: 100%;
+      object-fit: contain;
+    }
+  <%}%>
+</style>
+<div class="content-wrapper">
+  <section class="content">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box box-info">
+          <div class="box-header">
+            <h3 class="box-title"><%- title %></h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+            <a href="javascript:;" type="button" class="btnanchor btn  btn-success upload-btn">Upload New File</a>
+        </div>
+        <div class="col-xs-12">
+          <form id="upload_form" enctype="multipart/form-data" method="post">
+            <input type="file" style="display: none" id="upload-image" onchange="return uploadFile(this)" >
+            <progress id="progressBar" style="display: none;width: 100%"  value="0" max="100"></progress>
+            <h3 id="status"></h3>
+            <p id="loaded_n_total"></p>
+          </form>    
+          <form id="upload_zip" enctype="multipart/form-data" method="post">
+            <input type="file" style="display: none" id="upload-zip" onchange="return uploadZip(this)" >
+            <progress id="progressBarZip" style="display: none;width: 100%"  value="0" max="100"></progress>
+            <h3 id="statusZip"></h3>
+            <p id="loaded_zip_total"></p>
+          </form>         
+        </div>
+    </div>
+    
+    <div class="row">
+
+      <div class="col-xs-12">
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title form-search_title">Search</h3>
+            <div class="form-search">
+              <div class="clear">
+                <div class="search">
+                  <form method="GET">
+                    <div>
+                      <label for="title" tag="" class="optional">Title to search images</label>
+                      <input type="text" value="<%- query.title %>" style="min-width:300px" class="form-control" name="title" id="title">
+                    </div>
+                   
+                    <div>
+                      <label for="limit" tag="" class="optional">How many images you want to import</label>
+                      <input type="number"  max="10" min="1"
+                        value="<%- query.limit ? query.limit : 10 %>" class="form-control" name="limit" id="limit">
+                      <span style="margin-top:5px; display: block;">Max limit is 10</span>
+                    </div>
+                    
+                    <div>
+                      <label for="image_size" tag="" class="optional">Image Size</label>
+                      <select name="image_size" class="form-control" id="image_size">
+                        <option value="256x256" <% if(query.image_size == '256x256'){ %> selected="selected" <% } %>>256x256</option>
+                        <option value="512x512" <% if( (query.image_size == '512x512' ) ){ %> selected="selected" <% } %>>512x512</option>
+                        <option value="1024x1024" <% if( (query.image_size == '1024x1024' || typeof query.image_size == "undefined" )){ %> selected="selected" <% } %>>1024x1024</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <div class="buttons">
+                        <button id="search" class="btn btn-primary" type="submit">Search</button> or <a  href="javascript:;" id="reset-button" onclick="window.location = window.location.pathname">reset</a>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      <%if(searchError){%>
+        alert("<%-searchError%>");
+        console.log(<%- JSON.stringify(searchError); %>);
+      <%}%>
+    </script>
+
+
+
+    <%if(searchResults && searchResults.length > 0){%>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="box box-info">
+            <form method="POST" class="submitForm-image">
+              <div class="box-body">
+                  <div class="container">
+                      <div class="row">
+                          <%for(var i=0;i<searchResults.length;i++){%>
+                            <div class="<%- isCover ? "col-md-4" : "col-md-2"; %> impVideoId" data-id="<%- i %>">
+                                <div class="card">
+                                    <div class="card-image">
+                                        <a href="<%- searchResults[i].url %>" target="_blank">
+                                          <img class="img-responsive" src="<%- searchResults[i].url %>">
+                                      </a>
+                                    </div>
+                                    <input type="hidden" class="image_url" value="<%- searchResults[i].url %>" />
+                                    <div class="card-action">
+                                        <div>
+                                            <input type="checkbox" class="selectVideo" value="" id="import_video_<%- i %>">&nbsp;
+                                            <label for="import_video_<%- i %>" tag="" class="optional">Import Image</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                          <%}%>
+                      </div>
+                  </div>
+              </div>
+              <div class="box-footer">
+                <button type="submit" class="btn btn-primary btn-import">Import Selected Images</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <% }else if(results && results.length > 0){%>
+        
+<div class="row">
+  <div class="col-xs-12">
+    <%if(results.length > 0){%>
+      <div class="callout callout-warning">
+        <p><%- results.length; %> Images Found</p>
+      </div>
+    <%}%>
+    <div class="box box-info">
+      <form>
+        <div class="box-body">
+            <div class="container">
+                <div class="row">
+                    <%for(var i=0;i<results.length;i++){%>
+                      <div class="<%- isCover ? "col-md-4" : "col-md-2"; %>"  data-id="<%- results[i].id %>">
+                          <div class="card">
+                              <div class="card-image">
+                                  <a href="<%- results[i].path %>" target="_blank">
+                                    <img class="img-responsive" src="<%- results[i].path %>">
+                                </a>
+                                <a class="delete-image" href="javascript:;" onclick="removeImage(<%- results[i].avtar_id %>)">
+                                  <i class="fa fa-trash"></i>
+                                </a>
+                              </div>                            
+                          </div>
+                      </div>
+                    <%}%>
+                </div>
+            </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal model-dialog-hide" id="modal-danger">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="close close-image" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">Delete</h4>
+          </div>
+          <div class="modal-body">
+              <p>Are you sure want to delete this? It will not be recoverable after being deleted.</p>
+          </div>
+          <div class="modal-footer">
+              <button type="button" onclick="deleteFunction()" class="btn btn-outline">Delete</button>
+          </div>
+      </div>
+      <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+<% }else{%>
+  <% if(Object.keys(query).length){%>
+  <div class="callout callout-info">
+      <p>No image found with your matching criteria.</p>
+  </div>
+  <% }else{ %>
+  <div class="callout callout-info">
+      <p>Please select criteria to search images.</p>
+  </div>
+  <% } %>
+  <% } %>
+</section>
+</div>
+<input type="file" style="display: none" id="upload-image" onchange="return uploadFile(this)" >
+
+<%- include('../includes/scripts.ejs') %>
+<script>
+  $(document).ready(function(e){
+    $('.upload-btn').click(function(e){
+      $('#upload-image').trigger('click');
+    })
+  });
+  function _(el) {
+        return document.getElementById(el);
+      }
+  function uploadFile(obj) {
+        var file = obj.files[0];
+        var formdata = new FormData();
+        formdata.append("file", file);
+        var ajax = new XMLHttpRequest();
+        ajax.upload.addEventListener("progress", progressHandler, false);
+        ajax.addEventListener("load", completeHandler, false);
+        ajax.addEventListener("error", errorHandler, false);
+        ajax.addEventListener("abort", abortHandler, false);
+        ajax.open("POST", "<%= process.env.ADMIN_SLUG %>/ai/upload/images/%><%-isCover;%>");
+        ajax.send(formdata);
+      }
+
+      function progressHandler(event) {
+        _('progressBar').style.display = "block";
+        _("loaded_n_total").innerHTML = "Uploaded " + event.loaded + " bytes of " + event.total;
+        var percent = (event.loaded / event.total) * 100;
+        _("progressBar").value = Math.round(percent);
+        _("status").innerHTML = Math.round(percent) + "% uploaded... please wait";
+      }
+
+      function completeHandler(event) {
+        var response = JSON.parse(event.currentTarget.response)        
+        _("status").innerHTML = response.message;
+        _("progressBar").value = 0; //wil clear progress bar after successful upload
+        if(response.error == 0){
+          window.location.reload();
+        }
+        //
+      }
+
+      function errorHandler(event) {
+        _("status").innerHTML = "Upload Failed";
+      }
+
+      function abortHandler(event) {
+        _("status").innerHTML = "Upload Aborted";
+      }
+</script>
+<script>
+  var deleteObj;
+  function removeImage(id) {
+    deleteObj = id;
+    $("#modal-danger").addClass("show")
+  }
+  $(".close-image").click(function(){
+    deleteObj = null;
+    $("#modal-danger").removeClass("show")
+  })
+  function deleteFunction(){
+    window.location.href = "<%= process.env.ADMIN_SLUG %>/ai/delete-image/%>" + deleteObj;
+  }
+</script>
+<script type="application/javascript">
+$(document).ready(function(e) {
+  $(".selectVideo").prop("checked",true)
+})
+$(document).on("click",'#removeSelected',function(e){
+  if($(this). is(":checked")){
+    $(".selectVideo").prop("checked",true)
+  }else{
+    $(".selectVideo").prop("checked",false)
+  }
+})
+
+  $(document).on("submit",'.submitForm-image',function(e){
+    e.preventDefault();
+  
+    let data = [];
+    $('.btn-import').attr('disabled', true);
+      $('.btn-import').text('Please wait..');
+      $('.impVideoId').each(function(index, el) {
+        var id = $(this).data('id');
+        var is_checked = $(this).find('#import_video_'+id).is(":checked");
+        if (is_checked) {
+          let obj = {
+            id: id, 
+            image_url: $(this).find('.image_url').val(),
+          }
+          data.push(obj);
+        }
+      });
+    $.post('<%- adminLink %>/ai/import/images', {images: JSON.stringify(data),isCover:"<%-isCover;%>"}, function (response) {
+        let responseData = response
+        if(responseData.isValid != 0){
+          alert("Images Imported Successfully.");
+          $('.btn-import').removeAttr('disabled');
+          $('.btn-import').text('Import Selected Images');
+          <%if(!isCover){%>
+            window.location.href = "<%-adminLink %>/ai/avtars";
+          <%}else{%>
+            window.location.href = "<%-adminLink %>/ai/covers";
+          <%}%>
+        }else{
+          alert(responseData.message)
+        }
+    });
+  })
+
+</script>
+
+<%- include('../includes/footer.ejs') %>

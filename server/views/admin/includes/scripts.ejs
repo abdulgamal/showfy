@@ -1,0 +1,49 @@
+<!-- jQuery 3 -->
+  <script src="<%- process.env.subFolder%>bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="<%- process.env.subFolder%>js/admin/jquery.form.js"></script>
+  <%if(typeof ALLOWALLUSERINADMIN == "undefined" || !ALLOWALLUSERINADMIN){%>
+  <script src="<%- process.env.subFolder%>js/admin/core.js"></script>
+  <%}else{%>
+<script type="application/javascript">
+  $(document).ready(function(e){
+    $(".box-footer").find('button').attr("disabled",'disabled');
+    $(".btn-danger").removeAttr("onClick").attr("onClick",'alert("disabled");');
+    $("#modal-danger, #modal-default").remove();
+  });
+  $(document).on('submit','.ajaxForm',function(e) {
+    e.preventDefault();
+    return false;
+  });
+</script>
+  <%}%>
+<script type="application/javascript">
+$(document).on('click','.delete-selected',function(e){
+    if($("tbody tr").find(".checkbox").is(":checked")){
+        let itemArray = []
+        $("tbody tr").find(".checkbox").each(function() 
+        {
+          if($(this).is(':checked') && $(this).val() != "on")
+              itemArray.push($(this).val());
+        });
+        if(confirm("Are you sure you want to delete!!!"))
+          window.location.href = "?ids="+itemArray.join(",")
+    }else{
+        alert("Please select entry to delete.");
+    }
+  })
+  $(document).on('click','.checkall',function(e){
+    if($(this).prop('checked')){
+        $('tr').find(".checkbox").prop("checked", true);
+    }else{
+        $('tr').find(".checkbox").prop("checked", false);
+    }
+  })
+</script>
+  <!-- Bootstrap 3.3.7 -->
+  <script src="<%- process.env.subFolder%>bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <!-- FastClick -->
+  <script src="<%- process.env.subFolder%>bower_components/fastclick/lib/fastclick.js"></script>
+  <!-- AdminLTE App -->
+  <script src="<%- process.env.subFolder%>dist/js/adminlte.js"></script>
+  <!-- Sparkline -->
+  <script src="<%- process.env.subFolder%>bower_components/PACE/pace.min.js"></script>

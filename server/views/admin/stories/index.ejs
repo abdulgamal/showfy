@@ -1,0 +1,202 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/navigation.ejs') %>
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title"><%- title %></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title form-search_title">Search</h3>
+                        <div class="form-search">
+                            <div class="clear">
+                                <div class="search">
+                                    <form   method="GET">
+                                       
+
+                                        <div>
+                                            <label for="displayname" tag="" class="optional">Owner Name</label>
+                                            <input type="text" value="<%- query.displayname %>" class="form-control"
+                                                name="displayname" id="displayname">
+                                        </div>
+                                        <div>
+                                            <label for="email" tag="" class="optional">Owner Email</label>
+                                            <input type="text" value="<%- query.email %>" class="form-control"
+                                                name="email" id="email">
+                                        </div>
+                                       
+                                
+                                <div>
+                                    <div class="buttons">
+                                        <button id="search" class="btn btn-primary" type="submit">Search</button> or <a  href="javascript:;" onclick="window.location = window.location.pathname">reset</a>
+                                    </div>
+                                </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+
+<%if(results.length > 0){%>
+<div class="row">
+    <div class="col-xs-12">
+        <div class="callout callout-warning">
+            <p><%- totalCount %> Stories Found</p>
+        </div>
+        <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                    <tr>
+                        <th><input type="checkbox" class="checkbox checkall"></th>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Owner</th>
+                        <th>Creation Date</th>
+                        <!-- <th title="Approved">A</th> -->
+                        <th>Options</th>
+                    </tr>
+                    <%for(var i=0;i<results.length;i++){%>
+                    <tr>
+                        <td><input type="checkbox" class="checkbox" name="delete_<%-results[i].story_id%>" value="<%-results[i].story_id%>"></td>
+                        <td><%- results[i].story_id %></td>
+                        <td>
+                            <%if(results[i].type == "0"){%>
+                                Photo   
+                            <%}else if(results[i].type == "1"){%>
+                                Video
+                            <%}else if(results[i].type == "2"){%>
+                                Audio
+                            <%}else if(results[i].type == "3"){%>
+                                text
+
+                            <%}%>
+                        </td>
+                        <td><a href="<%- process.env.subFolder%><%= results[i].username %>" target="_blank"><%- results[i].displayname %></a>
+                        
+                        <td>
+                            <%let dateS = moment(results[i].creation_date).locale("en")%>
+                            <%= 
+                                    dateS.tz(defaultTimezone).format(formatDate)
+                            
+                            %>
+                        </td>
+                        <!-- <td><%if(results[i].approve == 1){ %>
+                            <a title="Mark as Un-Approved" class="approve" href="javascript:;"
+                                data-id="<%- results[i].audio_id %>">
+                                <img style="height: 20px;" src="/images/admin/check_image.png" />
+                            </a> <%}else{%> <a title="Mark as Approved" class="approve" href="javascript:;"
+                                data-id="<%- results[i].audio_id %>">
+                                <img style="height: 20px;" src="/images/admin/error_image.png" />
+                            </a> <% } %></td> -->
+
+                       
+                        <td>
+                            <%if(results[i].type == '0'){%>
+                            <a class="btn btn-primary btn-xs" href="<%- imageSuffix%><%= results[i].image %>"
+                                target="_blank">View</a>
+                            <%}%>
+                            <%if(results[i].type == '1' || results[i].type == '2'){%>
+                                <a class="btn btn-primary btn-xs" href="<%- imageSuffix%><%= results[i].file %>"
+                                    target="_blank">View</a>
+                                <%}%>
+                            <a class="btn btn-danger btn-xs" onclick="preDeleteFn(this)"
+                                data-id="<%-results[i].story_id;%>" data-toggle="modal"
+                                data-target="#modal-danger">Delete</a>
+                            
+                </td>
+              </tr>
+              <% } %>
+                </table>
+                <button type="button" class="btn btn-primary delete-selected">Delete Selected</button>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <div class="modal model-dialog-hide" id="modal-danger">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Delete</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure want to delete this? It will not be recoverable after being deleted.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" onclick="deleteFunction()" class="btn btn-outline">Delete</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <%if (paggingData) { %>
+        <div class="box-footer clearfix">
+            <%- paggingData %>
+        </div>
+        <% } %>
+        <!-- /.box -->
+    </div>
+</div>
+<% }else{%>
+<% if(Object.keys(query).length){%>
+<div class="callout callout-info">
+    <p>No record found with your matching criteria.</p>
+</div>
+<% }else{ %>
+<div class="callout callout-info">
+    <p>No Stories created on your website yet.</p>
+</div>
+<% } %>
+<% } %>
+<!-- /.error-page -->
+</section>
+<!-- /.content -->
+</div>
+<%- include('../includes/scripts.ejs') %>
+
+<script>
+   
+    $(document).on('click', '.approve', function (e) {
+        e.preventDefault()
+        var imageData = $(this).find("img").attr('src')
+        $(this).find("img").attr("src", '/images/admin/loading.gif');
+        var that = this
+        $.post("<%= process.env.ADMIN_SLUG %>/story/approve/" + $(this).attr("data-id"), {}, function (respose) {
+            if (respose.error) {
+                $(that).find('img').attr('src', imageData)
+            } else {
+                if (respose.status) {
+                    $(that).find('img').attr('src', "/images/admin/check_image.png")
+                } else {
+                    $(that).find('img').attr('src', "/images/admin/error_image.png")
+                }
+            }
+        })
+    })
+    
+    var deleteObjectId;
+    function preDeleteFn(obj) {
+        deleteObjectId = $(obj).attr('data-id');
+    }
+    function deleteFunction() {
+        window.location.href = "<%= process.env.ADMIN_SLUG %>/story/delete/%>" + deleteObjectId;
+    }
+</script>
+<%- include('../includes/footer.ejs') %>

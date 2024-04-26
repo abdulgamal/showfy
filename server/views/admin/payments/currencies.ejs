@@ -1,0 +1,222 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/navigation.ejs') %>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+              <div class="box-header">
+                  <h3 class="box-title"><%- title %></h3>
+                </div>
+            </div>
+          </div>
+      </div>
+        <div class="row">
+          <div class="col-xs-4">
+              <div class="btnanchor">
+                <a href="<%= process.env.ADMIN_SLUG %>/payments/currencies/create" type="button" class="btn btn-success upload-btn">Add New Currency</a>
+              </div>
+            </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+        <div class="save-currency-api col-md-6" style="display:flex">
+          Currency Converter API key
+          <input type="text" class="form-control save-currency-api-value" value="<%-apiKEY%>" />
+          <button type="button" class="btn btn-primary mb-3 ml-2 save-api-currency">Save</button>
+        </div>
+        
+        <%if(apiKEY){%>
+          <button type="button" class="btn btn-primary mb-4 update-currencies">Update Currency Values</button>
+        <%}%>
+        <p class="api-description">
+          <a href="https://free.currencyconverterapi.com/free-api-key" target="_blank">Click here</a> to create free license key.
+        </p>
+          </div>
+          </div>
+        <%if(results.length > 0){%>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="callout callout-warning">
+                  <p><%- results.length %> Currencies Founds.</p>
+                </div>
+              <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body table-responsive no-padding">
+                  <table class="table table-hover">
+                    <tr>
+                      <th>
+                         <div>ID</div>
+                      </th>
+                      <th>
+                         <div>Symbol</div>
+                      </th>
+                      <th>
+                         <div> Currency</div>
+                      </th>
+                      <th>
+                         <div> Default</div>
+                      </th>
+                      <th>
+                         <div> Active</div>
+                      </th>
+                      <th>
+                         <div> Currency Rate</div>
+                      </th>
+                      <th>
+                         <div>Options</div>
+                      </th>
+                   </tr>
+                    <%for(var i=0;i<results.length;i++){%>
+                      <tr id="<%-results[i].currency_id%>">
+                        <td> 
+                           <%-results[i].ID %>
+                        </td>
+                        <td> 
+                           <%-results[i].symbol%>
+                        </td>
+                        <td>
+                           <%-results[i].currency%>
+                        </td>
+                        <td>
+                           <%if(results[i].default == 0){%>
+                           <%if(results[i].default == 1){ %>
+                              <a title="Remove from Default" class="approve" href="javascript:;"
+                                  data-id="<%- results[i].currency_id %>">
+                                  <img style="height: 20px;" src="/images/admin/check_image.png" />
+                              </a> <%}else{%> <a title="Mark as Default" class="approve" href="javascript:;"
+                                  data-id="<%- results[i].currency_id %>">
+                                  <img style="height: 20px;" src="/images/admin/error_image.png" />
+                              </a> 
+                            <% } %>
+                            <%}else{%>
+                              -
+                           <%}%>
+                        </td>
+                        <td>
+                           <%if(results[i].default == 0){%>
+                           <%if(results[i].active == 1){ %>
+                              <a title="Deactivate" class="activeCurrency" href="javascript:;"
+                                  data-id="<%- results[i].currency_id %>">
+                                  <img style="height: 20px;" src="/images/admin/check_image.png" />
+                              </a> <%}else{%> <a title="Activate" class="activeCurrency" href="javascript:;"
+                                  data-id="<%- results[i].currency_id %>">
+                                  <img style="height: 20px;" src="/images/admin/error_image.png" />
+                              </a> 
+                            <% } %>
+                            <%}else{%>
+                              -
+                           <%}%>
+                        </td>
+                        <td>
+                           <%-results[i].currency_value%>
+                        </td>
+                        <td> 
+                           <div class="action-button">
+                            <a  class="btn btn-primary btn-xs" href="<%= process.env.ADMIN_SLUG %>/payments/currencies/create/<%-results[i].currency_id;%>">Edit</a>
+                            <%if(results[i].default == 0){%>
+                                 <!-- <a href="#" class="btn btn-danger btn-xs" onclick="preDeleteFn(this)"
+                                    data-id="<%-results[i].currency_id;%>" data-toggle="modal"
+                                    data-target="#modal-danger"> Delete</a> -->
+                              <% } %>
+                              </div>   
+                        </td>  
+                     </tr>
+                   <% } %>
+                  </table>
+                  <!-- <button type="button" class="btn btn-primary delete-selected">Delete Selected</button> -->
+                </div>
+                <!-- /.box-body -->
+              </div>
+              <div class="modal model-dialog-hide" id="modal-danger">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Delete</h4>
+                      </div>
+                      <div class="modal-body">
+                        <p>Are you sure want to delete this? It will not be recoverable after being deleted.</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" onclick="deleteFunction()" class="btn btn-outline">Delete</button>
+                      </div>
+                    </div>
+                    <!-- /.modal-content -->
+                  </div>
+                  <!-- /.modal-dialog -->
+                </div>
+              
+              <!-- /.box -->
+            </div>
+          </div>
+        <% }else{%>
+              <div class="callout callout-info">  
+                  <p>No currency created by you yet.</p>
+              </div>
+        <% } %>
+      <!-- /.error-page -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <%- include('../includes/scripts.ejs') %>
+
+  <script type="application/javascript">
+
+$(document).on('click', '.update-currencies', function (e) {
+      window.location.href = "<%= process.env.ADMIN_SLUG %>/payments/currencies/update-values";
+    })
+    $(document).on('click', '.activeCurrency', function (e) {
+        e.preventDefault()
+        var imageData = $(this).find("img").attr('src')
+        $(this).find("img").attr("src", '/images/admin/loading.gif');
+        var that = this
+        $.post("<%= process.env.ADMIN_SLUG %>/payments/currencies/default/" + $(this).attr("data-id"), {}, function (respose) {
+            if (respose.error) {
+                $(that).find('img').attr('src', imageData)
+            } else {
+                if (respose.status) {
+                    $(that).find('img').attr('src', "/images/admin/check_image.png")
+                } else {
+                    $(that).find('img').attr('src', "/images/admin/error_image.png")
+                }
+            }
+        })
+    })
+    $(document).on('click', '.approve', function (e) {
+        e.preventDefault()
+        var imageData = $(this).find("img").attr('src')
+        $(this).find("img").attr("src", '/images/admin/loading.gif');
+        var that = this
+        $.post("<%= process.env.ADMIN_SLUG %>/payments/currencies/default/" + $(this).attr("data-id"), {}, function (respose) {
+            if (respose.error) {
+                $(that).find('img').attr('src', imageData)
+            } else {
+               window.location.reload();
+            }
+        })
+    }) 
+    $(document).on('click', '.save-api-currency', function (e) {
+        e.preventDefault()
+        
+        $.post("<%= process.env.ADMIN_SLUG %>/payments/currencies/save-api", {value:$('.save-currency-api-value').val()}, function (respose) {
+            
+        })
+    })
+
+    var deleteObjectId;
+    function preDeleteFn(obj){
+      deleteObjectId = $(obj).attr('data-id');
+      
+    }
+    function deleteFunction(){
+      window.location.href = "<%= process.env.ADMIN_SLUG %>/payments/currencies/delete/%>"+deleteObjectId;
+    }
+  </script>
+  
+  
+  <%- include('../includes/footer.ejs') %>

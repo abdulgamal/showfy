@@ -1,0 +1,56 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/navigation.ejs') %>
+  <div class="content-wrapper">
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-info">
+                  <div class="box-header">
+                      <h3 class="box-title"><%- title %></h3>
+                    </div>
+                </div>
+              </div>
+          </div>
+        <div class="row">
+            <div class="col-xs-12">
+              <div class="box box-info">
+                <form method="POST" class="ajaxForm">
+                  <div class="box-body">
+                        <%- reg_form.toHTML(); %>
+                    </div>
+                    <div class="box-footer">
+                      <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                  </form>
+              </div>
+            </div>
+          </div>
+    </section>
+  </div>
+  <div class="modal model-dialog-hide" id="modal-tmdb">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">How to import multiple TMDB Movies/Series</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                  You can import multiple Movies/Series by visiting this URL: <%- process.env.PUBLIC_URL+"/movies/import?type=movie"; %>
+                  <br><br>
+                  You can change type to movie or tv (series).
+                  <br><br>
+                  You can use all filters specified <a target="_blank" href="https://developers.themoviedb.org/3/discover/movie-discover">here</a>. You can check some examples <a target="_blank" href="https://www.themoviedb.org/documentation/api/discover">here</a>.
+                </p>
+            </div>
+            <div class="modal-footer">
+              <button type="button"  data-dismiss="modal" aria-label="Close" class="btn btn-primary">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+  <%- include('../includes/scripts.ejs') %>
+  <%- include('../includes/footer.ejs') %>

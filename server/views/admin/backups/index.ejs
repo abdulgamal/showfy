@@ -1,0 +1,142 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/navigation.ejs') %>
+<div class="content-wrapper">
+  <section class="content">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box box-info">
+          <div class="box-header">
+            <h3 class="box-title"><%- title %></h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-4">
+          <div class="btnanchor">
+            <a href="javascript:;" type="button" class="btn btn-success create-item">Create New Backup</a>
+          </div>
+        </div>
+    </div>
+    
+    <%if(results.length > 0){%>
+      <div class="row">
+          <div class="col-xs-12">
+              <div class="callout callout-warning">
+                <p><%- totalCount %> Backup(s) Founds.</p>
+              </div>
+            <div class="box">
+              <!-- /.box-header -->
+              <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                  <tr>
+                    <th><input type="checkbox" class="checkbox checkall"></th>
+                    <th>ID</th>
+                    <th>Folder Path</th>
+                    <th>Status</th>
+                    <th>Creation Date</th>
+                    <th>Options</th>
+                  </tr>
+                  <%for(var i=0;i<results.length;i++){%>
+                  <tr>
+                    <td><input type="checkbox" class="checkbox" name="delete_<%-results[i].backup_id%>" value="<%-results[i].backup_id%>"></td>
+                    <td><%- results[i].backup_id %></td>
+                    
+                    <td>
+                        SCRIPT_DIR/backups/<%- results[i].dirname %>
+                    </td>
+                    <td><%- results[i].active == 0 ? "Processing" : (results[i].active == 1 ? "Completed" : "Failed") %></td>
+                    <td>
+                      <%let dateS = moment(results[i].creation_date).locale("en")%>
+                      <%= 
+                          dateS.tz(defaultTimezone).format(formatDate)
+                      %>
+                    </td>
+                    <td>
+                        <% if(results[i].active == 1){ %>
+                            <a  class="btn btn-primary btn-xs" href="<%- process.env.ADMIN_SLUG%>/backup/download/<%-results[i].backup_id%>/zip">Download Full Backup</a>
+                            <a  class="btn btn-primary btn-xs" href="<%- process.env.ADMIN_SLUG%>/backup/download/<%-results[i].backup_id%>/sql">Download SQL Backup</a>
+                        <%}%>
+                        <% if(results[i].active != 0){ %>
+                            <a  class="btn btn-danger btn-xs" onclick="preDeleteFn(this)" data-id="<%- results[i].backup_id; %>" data-toggle="modal" data-target="#modal-danger" >Delete</a>
+                        <%}%>
+                    </td>
+                  </tr>
+                 <% } %>
+                </table>
+                <button type="button" class="btn btn-primary delete-selected">Delete Selected</button>
+              </div>
+              <%if (paggingData) { %>
+                <div class="box-footer clearfix">
+                  <%- paggingData %>
+                </div>
+                <% } %>
+              <!-- /.box-body -->
+            </div>
+            <div class="modal model-dialog-hide" id="modal-danger">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span></button>
+                      <h4 class="modal-title">Delete</h4>
+                    </div>
+                    <div class="modal-body">
+                      <p>Are you sure want to delete this backup? It will not be recoverable after being deleted.</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" onclick="deleteFunction()" class="btn btn-outline">Delete</button>
+                    </div>
+                  </div>
+                  <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+              </div>
+            
+            <!-- /.box -->
+          </div>
+        </div>
+      <% }else{%>
+            <div class="callout callout-info">  
+                <p>No backups created by you yet.</p>
+            </div>
+      <% } %>
+
+  </section>
+</div>
+<%- include('../includes/scripts.ejs') %>
+<style type="text/css">
+.button-loading div{
+    top:5px;
+}
+.create-item{
+    height: 34px;
+    width: 150px;
+}
+</style>
+<script type="application/javascript">
+  $(".create-item").click(function(e){
+      if($(this).hasClass("active")){
+          return;
+      }
+      $(this).html('<div class="button-loading"><div></div><div></div><div></div><div></div></div>');
+      $(this).addClass("active");
+      let that = this;
+      $.post("<%-process.env.ADMIN_SLUG%>/backup",{},function(response){
+        alert(response.message);
+        $(that).html('Create New Backup');
+        $(that).removeClass("active");
+        if(!response.error){
+            window.location.reload();
+        }
+      })
+  })
+  var deleteObjectId;
+  function preDeleteFn(obj){
+    deleteObjectId = $(obj).attr('data-id');
+  }
+  function deleteFunction(){
+    window.location.href = "<%= process.env.ADMIN_SLUG %>/backup/delete/%>"+deleteObjectId;
+  }
+</script>
+<%- include('../includes/footer.ejs') %>

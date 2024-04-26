@@ -1,0 +1,19 @@
+{
+  "env": {
+    "PAYPAL_DEBUG": true,
+    "NODE_ENV": "development",
+    "PORT": "4000",
+    "DBUSER": "root",
+    "DBPASSWORD": "The3rdBrother",
+    "DBNAME": "showfy",
+    "DBHOST": "localhost",
+    "ADMIN_SLUG": "/video-admin",
+    "DBPORT": "3306",
+    "LOCALADDRESS": "127.0.0.1",
+    "TZ": "utc",
+    "PUBLIC_URL": "http://localhost:4000",
+    "SECRETKEY": "videoscriptsectetkey0root",
+    "JWT_SECRET_KEY": "JWT_SECRET_KEY",
+    "subFolder": "/"
+  }
+}

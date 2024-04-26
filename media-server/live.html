@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<script src="js/adapter-latest.js"></script>
+<script src="js/jquery-3.4.1.min.js"  crossorigin="anonymous"></script>
+<script src="js/popper.min.js" crossorigin="anonymous"></script>
+<script src="js/bootstrap.min.js"  crossorigin="anonymous"></script>	
+<style>
+#localVideo{
+	width: 100%;
+    height: calc(100vh - 60px);
+    object-fit: cover;
+}
+.optioSettings{
+	margin-left: 15px;
+}
+.cam-options{
+	position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 15px;
+	width: 100%;
+	max-width: 500px;
+}
+.main-div{
+	position: fixed;
+    height: 100%;
+    background-color: #0000006b;
+    top: 0;
+	display: none;
+	z-index: 999999;
+}
+.close-popup{
+	display: block;
+	margin: 10px 0px;
+}
+</style>
+<style>
+.marquee-wrap{
+	position: absolute;
+	background: #ccc;
+	z-index: 99999;
+	bottom: 0;
+	width: 1164.8px;
+	left: 0;
+	right: 0;
+	transform-origin: left;
+}
+.marquee-wrap #marquee{
+	height: 50px;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	overflow:hidden;
+   	white-space: nowrap;
+}
+.marquee-wrap #marquee{
+	padding: 0 15px;
+	font-size: 24px;
+}
+.marquee-wrap #marquee span:last-child{
+	border-right: none;
+}
+.bannerText-wrap{
+	position: absolute;
+	background: transparent;
+	z-index: 99999;
+	bottom: 65px;
+	width: 1164.8px;
+	left: -10px;
+    right: 0;
+    transform-origin: left;
+}
+.bannerText-wrap h4{
+	font-size: 24px;
+}
+.bannerText-default h4{
+	transform: skew(20deg);
+}
+.bannerText-default{
+	padding: 0 45px;
+    padding-right: 30px;
+    display: inline-block;
+    margin: 0 45px;
+	background: rgb(219, 0, 0);
+    inset: 0px;
+    border-radius: 12px;
+    transform: skew(-20deg);
+    margin-left: -20px;
+}
+
+.bannerText-minimal{
+		display: block;
+		padding: 0 30px;
+		border-left: 10px solid;
+		background: #333;
+		color: #fff;
+}
+.bannerText-bubble{
+	padding: 0 15px;
+	border-radius: 30px;
+	margin: 0 15px;
+	display: inline-block;
+}
+.bannerText-block{
+	padding: 0 15px;
+}
+.overlayBner-wrap{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	background: transparent;
+	top: 0;
+	left: 0;
+}
+.overlayBner-wrap .overlayBner-image{
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	width: 100%;
+	height: 100%;
+}
+.lsLogo-wrap .lsLogo-image img{
+    object-fit: contain;
+    opacity: 1;
+    z-index: 11;
+    pointer-events: none;
+    user-select: none;
+}
+.video-container{
+	margin-bottom: 10px;
+}
+.txt-banner{
+	transform: scale(0.95);
+	position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    transform-origin: left;
+	user-select: none;
+}
+.fullscreen, .mute_unmute{
+	z-index: 99999999;
+	padding: 10px 10px;
+	align-items: center;
+	display: flex;
+	background: rgba(217, 217, 217, 0.63);
+    border: none;
+}
+.player-options{
+	display: flex;
+    align-items: center;
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+}
+.lsLogo-wrap{
+	position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 9999999999;
+    max-width: 100px;
+    max-height: 100px;
+	width: 30%;
+    height: auto;
+}
+.mute_unmute{
+	margin-right: 10px;
+}
+@media only screen and (max-width:768px){
+	.fullscreen svg, .mute_unmute svg{
+		height: 22px;
+		width: 22px;
+	}
+	.fullscreen, .mute_unmute{
+		padding: 2px 2px;
+	}
+	.lsLogo-wrap{
+		max-width: 75px;
+    	max-height: 75px;
+	}
+}
+.full{
+	height: 100vh !important;
+}
+</style>
+</head>
+
+<body>
+	<div class="main-container">
+		<div class="main-sub-container">
+			<div class="video-container position-relative">
+				<video id="localVideo"  autoplay playsinline muted></video>
+				<div class="overlayBner-wrap" style="display: none;">
+					<a href="javascript:;" class="clickItem">
+						<div class="overlayBner-image"></div>
+					</a>
+				</div>
+				<div class="lsLogo-wrap" style="display: none;">
+					<div class="lsLogo-image">
+						<a href="javascript:;" class="clickItem">
+							<img class="img-fluid" src="" >
+						</a>
+					</div>
+				</div>
+				  
+				<div class="txt-banner" id="txt-banner">
+				  <div class="marquee-wrap"  style="display: none;">
+					<div id="marquee">
+					
+					</div>
+				  </div>
+				  <div class="bannerText-wrap">
+					  <div class="bannerText-default"  style="display: none;">
+						  <h4 class="m-0 py-3"></h4>
+					  </div>
+					   <div class="bannerText-minimal"  style="display: none;">
+						  <h4 class="m-0 py-3"></h4>
+					  </div>
+					   <div class="bannerText-bubble"  style="display: none;">
+						  <h4 class="m-0 py-3"></h4>
+					  </div>
+					   <div class="bannerText-block"  style="display: none;">
+						  <h4 class="m-0 py-3"></h4>
+					  </div>
+				  </div>
+				</div>
+				<div class="player-options">
+					<!-- Mute -->
+					<button aria-label="Mute microphone" style="display: none;" class="mute_unmute" id="mute"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 25 25" fill="#464648"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></button>
+					<!-- Unmute -->
+					<button aria-label="Unmute microphone" class="mute_unmute" id="unmute"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 25 25" fill="#e54528"><path d="M0 0h24v24H0zm0 0h24v24H0z" fill="none"></path><path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"></path></svg></button>
+					<!-- Full Screen -->
+					<button onclick="requestingFullScreen();" id="fullscreen" aria-label="Full screen" class="fullscreen"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 25 25" fill="black"><path d="M0 0h24v24H0z" fill="none"></path><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"></path></svg></button>
+					<!-- Exit Full Screen -->
+					<button style="display: none;" onclick="requestingFullScreen();" id="exit_fullscreen" aria-label="Exit fullscreen" class="fullscreen"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 25 25" fill="black"><path d="M0 0h24v24H0z" fill="none"></path><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"></path></svg></button>
+				</div>
+			</div>
+			
+			<button class="btn btn-secondary ml-3 optioSettings">Settings</button>
+
+			<div class="main-div">
+				<div class="cam-options">				
+					<legend class="col-form-label video-source-legend" id="videosource"></legend>
+					<div id="browser_screen_share_doesnt_support_cnt">
+						<div class="form-check form-check-inline">	
+							<input class="form-check-input video-source" name="videoSource" type="radio" value="screen" 
+							id="screen_share_checkbox">
+							<label class="form-check-label font-weight-light" for="screen_share_checkbox" style="font-weight:normal" id="screen">
+									
+							</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input video-source" name="videoSource" type="radio" value="screen+camera" 
+								id="screen_share_with_camera_checkbox">
+							<label class="form-check-label font-weight-light" for="screen_share_with_camera_checkbox" style="font-weight:normal" id="screenwithcamera">
+									
+							</label>
+								<a id="browser_screen_share_doesnt_support" href="https://caniuse.com/#search=getDisplayMedia"> </a>
+						</div>
+					</div>
+					<div class="dropdown-divider"></div>
+					<legend class="col-form-label audio-source-legend" id="audiosource"></legend>
+					<button class="btn btn-secondary ml-3 close-popup">Close</button>
+				</div>	
+			</div>
+		</div>
+	</div>
+	
+</body>
+
+<script type="module" lang="javascript">
+	var fullscreenchange = false;
+	function requestingFullScreen(){
+		if(fullscreenchange){
+			$(".optioSettings").show();
+			$("#exit_fullscreen").hide();
+			$("#fullscreen").show();
+			fullscreenchange = false;
+			$("#localVideo").removeClass("full");
+			parent.$('body').removeClass("fullscreen-video");
+			sendRequest({message:"resize_window"})
+		}else{
+			$(".optioSettings").hide();
+			$("#exit_fullscreen").show();
+			$("#fullscreen").hide();
+			$("#localVideo").addClass("full");
+			parent.$('body').addClass("fullscreen-video");
+			fullscreenchange = true;
+		}
+	}
+	window.requestingFullScreen = requestingFullScreen;
+	var player;
+	$(document).on("click",'.mute_unmute',function(e){
+		if($(this).attr('id') == "mute"){
+			$("#mute").hide();
+			$("#unmute").show();
+		}else{
+			$("#mute").show();
+			$("#unmute").hide();
+		}
+		var video=document.getElementById("localVideo");
+		video.muted = !video.muted;
+	})
+
+	function goMarquee() {
+		i = i < width ? i + step : 1;
+		m.style.marginLeft = -i + 'px';
+	}
+	
+	window.addEventListener("resize", resize);
+	resize();
+	var width,i,step,space,m;
+	function resize(){
+		let outer = parent.document.getElementById('media_treaming_iframe'),
+			wrapper = document.getElementById('txt-banner');
+		let scale;
+		let availableWidth = outer.clientWidth
+		scale =  availableWidth / 1164.8
+		wrapper.style.transform = 'scale(' + scale + ')';
+	}
+
+	import {WebRTCAdaptor} from "./js/webrtc_adaptor.js"
+    import {getUrlParameter} from "./js/fetch.stream.js" 
+	
+
+	if (window.addEventListener) {
+		window.addEventListener("message", receiveMessage);
+	} else {
+		window.attachEvent("onmessage", receiveMessage);
+	}
+	var defaultData = {}
+	var bannerAdsData = {}
+	
+	$(document).on("click",'.close-popup',function(e){
+		e.preventDefault();
+		$(".main-div").hide();
+		parent.$(".lsVideoTop").show();
+	})
+	$(document).on("click",'.optioSettings',function(e){
+		e.preventDefault();
+		$(".main-div").show();
+		parent.$(".lsVideoTop").hide();
+	})
+	var initialized = false;
+	function receiveMessage(event) {
+		const message = event.data.message;
+		switch (message) {
+		case 'getData':
+			defaultData = event.data.value
+			streamId = defaultData.streamId
+			websocketURL = defaultData.url
+			token = defaultData.token
+			document.getElementById("videosource").innerHTML = defaultData.videosource
+			document.getElementById("screen").innerHTML = defaultData.screen
+			document.getElementById("screenwithcamera").innerHTML = defaultData.screenwithcamera
+			document.getElementById("audiosource").innerHTML = defaultData.audiosource
+			document.getElementById("browser_screen_share_doesnt_support").innerHTML = defaultData.browser_screen_share_doesnt_support
+			// document.getElementById("connecting").innerHTML = defaultData.connecting
+
+			//initialize the WebRTCAdaptor
+			initWebRTCAdaptor(true, autoRepublishEnabled);
+			//startPublishing();
+			break;
+		case 'stop':
+			stopPublishing();
+			break;
+		case 'brands' :
+			let data = event.data;
+			let brand = event.data.brand
+			bannerAdsData = data;
+			if(data.banners){
+				let isTicker = false;
+				let isBanner = false;
+				data.banners.forEach(banner => {
+					if(banner.ticker == 1){
+						isTicker = true;
+						$(".marquee-wrap").show();
+						$(".marquee-wrap").find('#marquee').html(banner.text);
+						$(".marquee-wrap").css("background",brand.background_color).css("color",brand.text_color);
+					}else{
+						isBanner = true;
+						$(".bannerText-wrap").show();
+						$(".bannerText-default").hide();
+						$(".bannerText-minimal").hide();
+						$(".bannerText-bubble").hide();
+						$(".bannerText-block").hide();
+						$(".bannerText-"+brand.theme).show();
+						$(".bannerText-"+brand.theme).find("h4").html(banner.text);
+						if(brand.theme == "minimal"){
+							$(".bannerText-minimal").css("border-color",brand.background_color);
+							$(".bannerText-minimal").find("h4").css("color",brand.text_color);
+						}else{
+							$(".bannerText-default").css("background",brand.background_color);
+							$(".bannerText-default").find("h4").css("color",brand.text_color);
+							$(".bannerText-bubble").css("background",brand.background_color);
+							$(".bannerText-bubble").find("h4").css("color",brand.text_color);
+							$(".bannerText-block").css("background",brand.background_color);
+							$(".bannerText-block").find("h4").css("color",brand.text_color);
+						}
+					}
+				})
+				if(!isTicker){
+					$(".marquee-wrap").hide();
+				}
+				if(!isBanner){
+					$(".bannerText-wrap").hide();
+					$(".bannerText-default").hide();
+					$(".bannerText-minimal").hide();
+					$(".bannerText-bubble").hide();
+					$(".bannerText-block").hide();
+				}
+			}else{
+				$(".marquee-wrap").hide();
+				$(".bannerText-wrap").hide();
+				$(".bannerText-default").hide();
+				$(".bannerText-minimal").hide();
+				$(".bannerText-bubble").hide();
+				$(".bannerText-block").hide();
+			}
+
+			if(brand.redirect_url){
+				$(".clickItem").attr("href",brand.redirect_url).attr("target",'_blank');
+			}else{
+				$(".clickItem").attr("href","javascript:;").removeAttr("target");
+			}
+
+			if(brand.overlay && brand.overlay_active == 1){
+				$(".overlayBner-wrap").show();
+				$(".overlayBner-wrap").find(".overlayBner-image").css("background-image",'url(' + brand.overlay + ')');
+			}else{
+				$(".overlayBner-wrap").hide();
+			}
+
+			if(brand.logo && brand.logo_active == 1){
+				$(".lsLogo-wrap").show();
+				$(".lsLogo-wrap").find(".lsLogo-image").find("img").attr('src',brand.logo);
+			}else{
+				$(".lsLogo-wrap").hide();
+			}
+			
+			i = 0,
+				step = 3,
+				space = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+			if(!initialized)
+				m = document.getElementById('marquee');
+			var t = m.innerHTML; //text
+			m.innerHTML = t + space;
+			m.style.position = 'absolute';
+			width = (m.clientWidth + 1);
+			m.style.position = '';
+			m.innerHTML = t + space + t + space + t + space + t + space + t + space + t + space + t + space;
+			if(!initialized){
+				m.addEventListener('mouseenter', function () {
+					step = 0;
+				}, true);
+				m.addEventListener('mouseleave', function () {
+					step = 3;
+				}, true);
+				var x = setInterval(goMarquee, 50);
+			}
+			initialized = true;
+		break;
+		}
+	}
+	function sendRequest(data){
+		window.top.postMessage(data, '*')
+	}
+
+	var maxVideoBitrateKbps = 1200;
+
+	//TODO: Migrate these methods to Jquery
+	
+	
+	/**
+	 * If publishing stops for any reason, it tries to republish again.
+	 */
+	var autoRepublishEnabled = true;
+	/**
+	 * Timer job that checks the WebRTC connection 
+	 */
+	var autoRepublishIntervalJob = null;
+	
+	var streamId;
+	
+	var token = getUrlParameter("token");
+	
+	// It should be true
+	var rtmpForward = getUrlParameter("rtmpForward");
+
+	function startPublishing() {
+		streamId = defaultData.streamId;
+		webRTCAdaptor.publish(streamId, token);
+	}
+
+	function stopPublishing() {
+		if (autoRepublishIntervalJob != null) {
+			clearInterval(autoRepublishIntervalJob);
+			autoRepublishIntervalJob = null;
+		}
+		webRTCAdaptor.stop(streamId);
+	}
+	
+  	function switchVideoMode(chbx) {
+  		if(chbx.value == "screen") {
+			  //webRTCAdaptor.switchDesktopWithMicAudio(streamId);
+			  webRTCAdaptor.switchDesktopCapture(streamId);
+  		}
+  		else if(chbx.value == "screen+camera"){
+			webRTCAdaptor.switchDesktopCaptureWithCamera(streamId);
+		}
+		else {
+  			webRTCAdaptor.switchVideoCameraCapture(streamId, chbx.value);
+  		}
+	}
+  	
+	function switchAudioMode(chbx) {
+		webRTCAdaptor.switchAudioInputSource(streamId, chbx.value);
+	}
+
+	function getCameraRadioButton(deviceName, deviceId) {
+		return "<div class=\"form-check form-check-inline\">" + 	
+							"<input class=\"form-check-input video-source\" name=\"videoSource\" type=\"radio\" value=\"" + deviceId + "\" id=\"" + deviceId + "\">" +
+							"<label class=\"form-check-label font-weight-light\" for=\"" + deviceId + "\" style=\"font-weight:normal\">" +
+								deviceName +
+							"</label>" +		
+						   "</div>";
+	}
+
+	function getAudioRadioButton(deviceName, deviceId) {
+		return "<div class=\"form-check form-check-inline\">" + 	
+							"<input class=\"form-check-input audio-source\" name=\"audioSource\" type=\"radio\" value=\"" + deviceId + "\" id=\"" + deviceId + "\">" +
+							"<label class=\"form-check-label font-weight-light\" for=\"" + deviceId + "\" style=\"font-weight:normal\">" +
+								deviceName +
+							"</label>" +		
+						   "</div>";
+	}
+
+	function toggleOptions() {
+		$(".options").toggle();
+	}
+	
+	function sendData() {
+		try {
+			var iceState = webRTCAdaptor.iceConnectionState(streamId);
+            if (iceState != null && iceState != "failed" && iceState != "disconnected") {
+            
+				webRTCAdaptor.sendData($("#streamName").val(), $("#dataTextbox").val());
+				$("#dataMessagesTextarea").append("Sent: " + $("#dataTextbox").val() + "\r\n");
+				$("#dataTextbox").val("");
+			}
+			else {
+				alert("WebRTC publishing is not active. Please click Start Publishing first")
+			}
+		}
+		catch (exception) {
+			console.error(exception);
+			alert("Message cannot be sent. Make sure you've enabled data channel on server web panel");
+		}
+	}
+	  
+	
+	function checkAndRepublishIfRequired() {
+	 	var iceState = webRTCAdaptor.iceConnectionState(streamId);
+		//console.log("Ice state checked = " + iceState);
+
+	  	if (iceState == null || iceState == "failed" || iceState == "disconnected"){
+	  		webRTCAdaptor.stop(streamId);
+	  		webRTCAdaptor.closePeerConnection(streamId);
+	  		webRTCAdaptor.closeWebSocket();
+	  		initWebRTCAdaptor(true, autoRepublishEnabled);
+		  }	
+	}
+
+    function startAnimation() {
+
+        $("#broadcastingInfo").fadeIn(800, function () {
+          $("#broadcastingInfo").fadeOut(800, function () {
+        		var state = webRTCAdaptor.signallingState(streamId);
+            if (state != null && state != "closed") {
+            	var iceState = webRTCAdaptor.iceConnectionState(streamId);
+            	if (iceState != null && iceState != "failed" && iceState != "disconnected") {
+              		startAnimation();
+            	}
+            }
+          });
+        });
+      }
+
+	var pc_config = {
+			'iceServers' : [ {
+				'urls' : 'stun:stun1.l.google.com:19302'
+			} ]
+		};
+	/* 
+	//sample turn configuration
+	{
+       iceServers: [
+                    { urls: "",
+                      username: "",
+                      credential: "",
+                    }
+                   ]
+    };
+    */
+
+	var sdpConstraints = {
+		OfferToReceiveAudio : false,
+		OfferToReceiveVideo : false
+	};
+	
+	var mediaConstraints = {
+		video : {width: 1920,height: 1080},
+		audio : true
+	};
+
+	
+	var websocketURL =  "";
+	
+	var	webRTCAdaptor = null;
+	
+	function initWebRTCAdaptor(publishImmediately, autoRepublishEnabled) 
+	{
+		webRTCAdaptor = new WebRTCAdaptor({
+				websocket_url : websocketURL,
+				mediaConstraints : mediaConstraints,
+				peerconnection_config : pc_config,
+				sdp_constraints : sdpConstraints,
+				localVideoId : "localVideo",
+				debug:true,
+				bandwidth:maxVideoBitrateKbps,
+				callback : (info, obj) => {
+					if (info == "initialized") {
+						// console.log("initialized");
+						if (publishImmediately) {
+							webRTCAdaptor.publish(streamId, token)
+						}
+						
+					} else if (info == "publish_started") {
+						//stream is being published
+						// console.log("publish started");
+						startAnimation();
+						if (autoRepublishEnabled && autoRepublishIntervalJob == null) 
+						{
+							autoRepublishIntervalJob = setInterval(() => {
+								checkAndRepublishIfRequired();
+							}, 3000);
+						}
+						webRTCAdaptor.enableStats(obj.streamId);
+						sendRequest({message:"playStarted"})
+					} else if (info == "publish_finished") {
+						//stream is being finished
+						// console.log("publish finished");
+						sendRequest({message:"finished"})
+					}
+					else if (info == "browser_screen_share_supported") {						
+						// console.log("browser screen share supported");
+						document.getElementById("browser_screen_share_doesnt_support").style.display = "none";
+					}
+					else if (info == "screen_share_stopped") {
+						//choose the first video source. It may not be correct for all cases. 
+						// console.log("screen share stopped");
+					}
+					else if (info == "closed") {
+						//console.log("Connection closed");
+						if (typeof obj != "undefined") {
+							// console.log("Connecton closed: " + JSON.stringify(obj));
+						}
+						sendRequest({message:"finished"})
+					}
+					else if (info == "pong") {
+						//ping/pong message are sent to and received from server to make the connection alive all the time
+						//It's especially useful when load balancer or firewalls close the websocket connection due to inactivity
+					}
+					else if (info == "refreshConnection") {
+						checkAndRepublishIfRequired();
+					}
+					else if (info == "ice_connection_state_changed") {
+						//console.log("iceConnectionState Changed: ",JSON.stringify(obj));
+					}
+					else if (info == "updated_stats") {
+						//obj is the PeerStats which has fields
+						 //averageOutgoingBitrate - kbits/sec
+						//currentOutgoingBitrate - kbits/sec
+						// console.log("Average outgoing bitrate " + obj.averageOutgoingBitrate + " kbits/sec"
+						// 		+ " Current outgoing bitrate: " + obj.currentOutgoingBitrate + " kbits/sec"
+						// 		+ " video source width: " + obj.resWidth + " video source height: " + obj.resHeight
+						// 		+ "frame width: " + obj.frameWidth + " frame height: " + obj.frameHeight
+						// 		+ " video packetLost: "  + obj.videoPacketsLost + " audio packetsLost: " + obj.audioPacketsLost
+						// 		+ " video RTT: " + obj.videoRoundTripTime + " audio RTT: " + obj.audioRoundTripTime 
+						// 		+ " video jitter: " + obj.videoJitter + " audio jitter: " + obj.audioJitter);						
+					}
+					else if (info == "data_received") {
+						// console.log("Data received: " + obj.event.data + " type: " + obj.event.type + " for stream: " + obj.streamId);
+						//$("#dataMessagesTextarea").append("Received: " + obj.event.data + "\r\n");
+					}
+					else if (info == "available_devices") {
+						var videoHtmlContent = "";
+						var audioHtmlContent = "";
+						obj.forEach(function(device) {
+							if (device.kind == "videoinput") {
+								videoHtmlContent += getCameraRadioButton(device.label, device.deviceId);
+							}
+							else if (device.kind == "audioinput"){
+								audioHtmlContent += getAudioRadioButton(device.label, device.deviceId);
+							}
+						}); 
+						$(videoHtmlContent).insertAfter(".video-source-legend");
+						$(".video-source").first().prop("checked", true);	
+						
+						$(audioHtmlContent).insertAfter(".audio-source-legend");
+						$(".audio-source").first().prop("checked", true);	
+
+						if (document.querySelector('input[name="videoSource"]')) {
+							document.querySelectorAll('input[name="videoSource"]').forEach((elem) => {
+								elem.addEventListener("change", function(event) {
+								var item = event.target;
+								switchVideoMode(item)
+								});
+  							});
+						}
+						if (document.querySelector('input[name="audioSource"]')) {
+							document.querySelectorAll('input[name="audioSource"]').forEach((elem) => {
+								elem.addEventListener("change", function(event) {
+								var item = event.target;
+								switchAudioMode(item)
+								});
+  							});
+						}
+					}
+					else {
+						console.log( info + " notification received");
+					}
+				},
+				callbackError : function(error, message) {
+					//some of the possible errors, NotFoundError, SecurityError,PermissionDeniedError
+					console.log("error message: " +JSON.stringify(message));
+					console.log("error callback: " +  JSON.stringify(error));
+					var errorMessage = JSON.stringify(error);
+					if (typeof message != "undefined") {
+						errorMessage = message;
+					}
+					var errorMessage = JSON.stringify(error);
+					if (error.indexOf("NotFoundError") != -1) {
+						errorMessage = "Camera or Mic are not found or not allowed in your device";
+					}
+					else if (error.indexOf("NotReadableError") != -1 || error.indexOf("TrackStartError") != -1) {
+						errorMessage = "Camera or Mic is being used by some other process that does not let read the devices";
+					}
+					else if(error.indexOf("OverconstrainedError") != -1 || error.indexOf("ConstraintNotSatisfiedError") != -1) {
+						errorMessage = "There is no device found that fits your video and audio constraints. You may change video and audio constraints"
+					}
+					else if (error.indexOf("NotAllowedError") != -1 || error.indexOf("PermissionDeniedError") != -1) {
+						errorMessage = "You are not allowed to access camera and mic.";
+					}
+					else if (error.indexOf("TypeError") != -1) {
+						errorMessage = "Video/Audio is required";
+					}
+					else if (error.indexOf("ScreenSharePermissionDenied") != -1) {
+						errorMessage = "You are not allowed to access screen share";
+						$(".video-source").first().prop("checked", true);						
+					}
+					else if (error.indexOf("WebSocketNotConnected") != -1) {
+						errorMessage = "WebSocket Connection is disconnected.";
+					}
+					alert(errorMessage);
+				}
+			});
+	}
+	
+	
+</script>
+</html>
