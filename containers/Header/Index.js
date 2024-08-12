@@ -30,7 +30,7 @@ export default function Index(props) {
                   </span>
                 )}
               </a> */}
-              <span className="logo-text">Showfy</span>
+              <span className="logo-text">NiPlugMedia</span>
             </Link>
           </div>
         </div>

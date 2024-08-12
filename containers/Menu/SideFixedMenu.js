@@ -29,6 +29,7 @@ const SideFixedMenu = (props) => {
       }
     }
   };
+
   const openSubMenu = (e, submenu) => {
     if (submenu) {
       if (state.subsubmenu != submenu[0].menu_id) {
@@ -212,7 +213,7 @@ const SideFixedMenu = (props) => {
             </div>
             <div className="logo">
               <Link href="/">
-                {/* <a>
+                <a>
                   {!props.pageData.appSettings.logo_type ||
                   props.pageData.appSettings.logo_type == "0" ? (
                     <img src={logo} className="img-fluid" />
@@ -221,8 +222,7 @@ const SideFixedMenu = (props) => {
                       {props.pageData.appSettings.logo_text}
                     </span>
                   )}
-                </a> */}
-                <span className="logo-text">Showfy</span>
+                </a>
               </Link>
             </div>
           </div>

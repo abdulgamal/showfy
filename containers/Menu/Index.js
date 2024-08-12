@@ -721,7 +721,7 @@ const Menu = (props) => {
                       </span>
                     )}
                   </a> */}
-                  <span className="logo-text">Showfy</span>
+                  <span className="logo-text">NiPlugMediaa</span>
                 </Link>
               </div>
 
@@ -1014,7 +1014,7 @@ const Menu = (props) => {
                           </span>
                         )}
                       </a> */}
-                      <span className="logo-text">Showfy</span>
+                      <span className="logo-text">NiplugMedia</span>
                     </Link>
                   </div>
                 </div>

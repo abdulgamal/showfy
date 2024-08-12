@@ -148,12 +148,12 @@
   }
 }
 @media only screen and (max-width: 992px) {
-  .minimizeBox video{
+  .minimizeBox video {
     width: 200px !important;
     height: 100px !important;
     object-fit: cover;
   }
-  .minimizeBox .video-js{
+  .minimizeBox .video-js {
     width: 100%;
     height: 100px;
   }
@@ -866,7 +866,7 @@
   .minimizeBox.logged-in-user {
     bottom: 70px;
   }
-  .minimizeBox video{
+  .minimizeBox video {
     width: 200px !important;
     height: 150px !important;
     object-fit: cover;

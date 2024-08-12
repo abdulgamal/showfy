@@ -3,18 +3,18 @@
      
     /* Background Colours */
     --Bgcolor-default: #F5F5F5;
-    --Bgcolor-primary: #FF1744;
-    --Bgcolor-secondry: #F1F1F1;
-    --Bgcolor-tertiary: #F1F1F1;
+    --Bgcolor-primary: #1D7874;
+    --Bgcolor-secondry: #000000;
+    --Bgcolor-tertiary: #2EBFB9;
     --Bgcolor-light: #f9f9f9;
     --Bgcolor-white: #ffffff;
     --Bgcolor-black: #000000;
-    --border-color: #CCCCCC;
+    --border-color: #9DBDBC;
     /* Text Colours */
     --Textcolor-default: #000000;
-    --Textcolor-primary: #FF1744;
+    --Textcolor-primary: #1D7875;
     --Textcolor-secondry: #000000;
-    --Textcolor-tertiary: #D4D3D3;
+    --Textcolor-tertiary: #F8F8F8;
     --Textcolor-light: #ececec;
     --Textcolor-white: #ffffff;
     --Textcolor-black: #000000;
@@ -82,8 +82,8 @@
     --chanlThmb-likeDislikeListColor: #333333;
     /* Artist listing */
     --artist-bg: transparent;
-    --artist-imgHeight: 180px;
-    --artist-nameFontSize: 18px;
+    --artist-imgHeight: 250px;
+    --artist-nameFontSize: 16px;
     --artist-nameColor: #000000;
     --artist-bordercolor: artist_bg;
     /* Member Listing */
@@ -130,7 +130,7 @@
     /* Video Grid new */
     --videoGrid-bg: transparent;
     --videoGrid-thumbImgHeight: 180px;
-    --videoGrid-titlefontSize: 18px;
+    --videoGrid-titlefontSize: 16px;
     --videoGrid-usertimeColor: #5f5f5f;
     --videoGrid-btnwidthHeight: 35px;
     --videoGrid-btnFontSize: 16px;
@@ -180,7 +180,7 @@
      --header-sidebar-color: #000000;
      --header-sidebar-hovercolor:#E5E5E5;
      --header-sidebar-title-color: #000000;
-     --header-sidebar-icon-color: #8F908F;
+     --header-sidebar-icon-color: #1D7874;
      --header-sidebar-fontsize: 16px;
      
      --scroll-track-bg: #ffffff;
@@ -197,5 +197,5 @@
      --header-popup-headbg: #F5F5F5;
      --header-popup-bodybg:#FFFFFF;
 
-     --arowBackColor:#000000;
+     --arowBackColor:#000;
  }
